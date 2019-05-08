@@ -3,8 +3,8 @@ DD247g project
 
 Timeline:
     Meet Friday 11am
-
-    Monday: All code complete
+    Meet Monday
+    Tuesday: All code complete
     Thurdsay: Report & Poster complete
     Friday: Project presentation & delivery
 
