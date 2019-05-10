@@ -1,0 +1,4 @@
+#files that will not be included in the docker image
+node_modules/
+npm-debug.log
+frontend/
