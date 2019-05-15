@@ -20,7 +20,6 @@ def index():
 @search_blueprint.route("/search",methods=['POST'],endpoint='search')
 def search():
     if request.method == 'POST':
-        print("-----------------Calling search Result----------")
         req_data = request.get_json()
         search_data = req_data["params"]
         search_term = search_data["term"]
@@ -30,15 +29,17 @@ def search():
             "query_string": {
               "analyze_wildcard": True,
               "query": str(search_term),
-              "fields": ["title", "date", "url", "description"]
+              "fields": ["title", "description", "size", "gender", "color", "price", "location"]
             }
           },
           "size": 50,
           "sort": [ ]
         }
         payload = json.dumps(payload)
-        url = "http://localhost:9200/index/subcat/_search"
+        url = "http://localhost:9200/blocket/items/_search"
         response = requests.request("GET", url, data=payload, headers=headers)
+        #Filtering/sorting/ and all that novelty stuff here?
+        
         response_dict_data = json.loads(str(response.text))
         return json.dumps(response_dict_data)
 

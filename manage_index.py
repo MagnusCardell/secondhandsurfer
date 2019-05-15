@@ -14,29 +14,35 @@ if __name__ == "__main__":
         print("1. Deleted template: search_engine_template")
         response_delete = requests.request("DELETE", url)
     payload = {
-          "template": "hacker",
+          "template": "blocket",
           "settings": {
             "number_of_shards": 1
           },
           "mappings": {
-            "tutorials":{
+            "items":{
                 "_source": {
                     "enabled": True
                 },
                 "properties":{
-                    "upvotes":{
-                        "type":"integer"
-                    },
-                    "topic":{
-                        "type":"text"
-                    },
                     "title":{
                         "type":"text"
                     },
-                    "url":{
+                    "description":{
                         "type":"text"
                     },
-                    "labels":{
+                    "size":{
+                        "type":"text"
+                    },
+                    "gender":{
+                        "type":"text"
+                    },
+                    "color":{
+                        "type":"text"
+                    },
+                    "price":{
+                        "type":"text"
+                    },
+                    "localtion":{
                         "type":"text"
                     }
                 }
@@ -53,45 +59,16 @@ if __name__ == "__main__":
     if (response.status_code == 200):
         print("2. Created a new template: search_engine_template")
 
-    url = "http://localhost:9200/hacker"
+    url = "http://localhost:9200/blocket"
     json_data = check_if_index_is_present(url)
 
     if(not 'error' in json_data):
-        print("3. Deleted an index: hacker")
+        print("3. Deleted an index: blocket")
         response = requests.request("DELETE", url)
 
     response = requests.request("PUT", url)
     if (response.status_code == 200):
-        print("4. Created an index: hacker")
-
-    url = "http://localhost:9200/autocomplete"
-    json_data = check_if_index_is_present(url)
-
-    if(not 'error' in json_data):
-        print("5. Deleting index: autocomplete")
-        response = requests.request("DELETE", url)
-
-    payload = {
-      "mappings": {
-        "titles" : {
-          "properties" : {
-            "title" : { "type" : "string" },
-            "title_suggest" : {
-              "type" :     "completion",
-              "analyzer" :  "standard",
-              "search_analyzer" : "standard",
-              "preserve_position_increments": False,
-              "preserve_separators": False
-            }
-          }
-        }
-      }
-    }
-    payload = json.dumps(payload)
-    response = requests.request("PUT", url, data=payload, headers=headers)
-
-    if(response.status_code==200):
-        print("6. Created a new index: autocomplete")
+        print("4. Created an index: blocket")
 
 
 

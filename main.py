@@ -9,7 +9,7 @@ TODO: Traverse all pages
 
 """
 
-import requests
+import requests, json
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
 
@@ -115,8 +115,32 @@ for category in categories:
         items = get_item_attributes(all_prices, all_items)
 
         counter += 1
+
+    i = 1
     for id, item in enumerate(items):
-        res = es.index(index="jeans", doc_type='item', id=id, body=item)
+        blocket_url = "http://localhost:9200/blocket/items"
+        payload ={
+            "title": item.title,
+            "description": item.description,
+            "size": item.size,
+            "gender": item.gender,
+            "color": item.color,
+            "price": item.price,
+            "location": item.location
+        }
+        headers = {
+            'Content-Type': "application/json",
+            'cache-control': "no-cache"
+        }
+        payload = json.dumps(payload)
+
+        response = requests.request("POST", blocket_url, data=payload, headers=headers)
+        if(response.status_code==201):
+            print("Values saved in blocket index")
+
+        print("----------------", i, "----------------------")
+        i = i + 1
+        #res = es.index(index="jeans", doc_type='item', id=id, body=item)
 
     
 
