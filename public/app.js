@@ -2,13 +2,13 @@ const vm = new Vue ({
     el: '#vue-instance',
     data () {
       return {
-        baseUrl: 'http://localhost:8005', // API url
-        searchTerm: '', // Default search term
+        baseUrl: 'http://localhost:8005', // API
+        searchTerm: '', // default search term
         searchDebounce: null, // Timeout for search bar debounce
         searchResults: [], // Displayed search results
         numHits: null, // Total search results found
   
-        selectedParagraph: null, // Selected paragraph object
+        selectedItem: null, // selected object
         paragraphs: [] // Paragraphs being displayed in book preview window
       }
     },

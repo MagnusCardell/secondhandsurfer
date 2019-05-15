@@ -1,10 +1,11 @@
+from elasticsearch import Elasticsearch
 from flask import Blueprint,render_template,request,jsonify
 import requests,json
 
 # creating a Blueprint class
 search_blueprint = Blueprint('search',__name__,template_folder="templates")
 search_term = ""
-
+es = Elasticsearch(hosts=[{"host":'elasticsearch'}]) 
 
 headers = {
     'Content-Type': "application/json",
@@ -14,30 +15,39 @@ headers = {
 
 @search_blueprint.route("/",methods=['GET','POST'],endpoint='index')
 def index():
-  return
+  return connect_elasticsearch()
 
 @search_blueprint.route("/search",methods=['POST'],endpoint='search')
 def search():
     if request.method == 'POST':
         print("-----------------Calling search Result----------")
-        search_term = request.form["input"]
+        req_data = request.get_json()
+        search_data = req_data["params"]
+        search_term = search_data["term"]
         print("Search Term:", search_term)
         payload = {
           "query": {
             "query_string": {
               "analyze_wildcard": True,
               "query": str(search_term),
-              "fields": ["topic", "title", "url", "labels"]
+              "fields": ["title", "date", "url", "description"]
             }
           },
           "size": 50,
           "sort": [ ]
         }
         payload = json.dumps(payload)
-        url = "http://elasticsearch:9200/hacker/tutorials/_search"
+        url = "http://localhost:9200/index/subcat/_search"
         response = requests.request("GET", url, data=payload, headers=headers)
         response_dict_data = json.loads(str(response.text))
         return json.dumps(response_dict_data)
 
 
-
+#This should not exist in production settings
+@search_blueprint.after_request
+def add_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Headers, Origin, X-Requested-With, Content-Type, Accept, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, HEAD'
+    response.headers['Access-Control-Expose-Headers'] = '*'
+    return response

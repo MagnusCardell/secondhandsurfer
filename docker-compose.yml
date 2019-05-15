@@ -14,8 +14,7 @@ services:
     ports:
       - "9200:9200"
 
-  frontend: # Nginx Server For Frontend App
-    container_name: gs-frontend
+  frontend:
     image: nginx
     volumes: # Serve local "public" dir
       - ./public:/usr/share/nginx/html
