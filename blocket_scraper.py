@@ -144,13 +144,8 @@ for gender, category in enumerate(categories):
         counter += 1
 
     i = 1
-   
-    print("now items")
-    print(items)
 
     for article in items:
-        print(article)
-        print(id)
         blocket_url = "http://localhost:9200/blocket/items"
         payload ={
             "title": article['title'],
@@ -166,14 +161,11 @@ for gender, category in enumerate(categories):
             'Content-Type': "application/json",
             'cache-control': "no-cache"
         }
-        print(payload)
         payload = json.dumps(payload)
 
         response = requests.request("POST", blocket_url, data=payload, headers=headers)
         if(response.status_code==201):
-            print("Values saved in blocket index")
-
-        print("----------------", i, "----------------------")
+            print("----------------", i, "----------------------")
         i = i + 1
         #res = es.index(index="jeans", doc_type='item', id=id, body=item)
 
