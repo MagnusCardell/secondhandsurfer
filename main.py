@@ -10,6 +10,7 @@ from elasticsearch import Elasticsearch
 import numpy as np
 import math
 import statistics
+import operator
 #def indexing(path):
     
 
@@ -86,7 +87,7 @@ for filename in os.listdir(path):
 n_items = len(descriptions)
 
 while (getting_queries):
-    queries = query.split(',')
+    queries = queries.split(',')
     num_q = len(queries)
     ##preprocessing of queries
     colors = []
@@ -118,22 +119,34 @@ while (getting_queries):
         for i in range(num_q):
             sizes.append(len(results[i]))
         scores = np.zeros(tuple(sizes))
-        scores1 = np.zeros(tuple(sizes))
+        scores1 =  {} #np.zeros(tuple(sizes))
         it = np.nditer(scores, flags = ['multi_index'])
         while not it.finished:
             current_index = it.multi_index
             """ update this line properly to get score from results  """
-            scores1[current_index] = 0.6*statistics.mean([])
+            scores1[current_index] = [0.6*statistics.mean([results[i]['hits'][current_index[i]]['score'] for i in range(num_q)])]
+            dist = least_distance([results[i]['hits'][current_index[i]]['location'] for i in range(num_q)])
+            scores1[current_index].append(dist)
             it.iternext()
+        dist_list = [float(scores1[key][1]) for key in scores1.keys()]
+        dist_list.sort()
+        lenth = len(dist_list)
+        n1 = dist_list[int(lenth/4)]
+        n2 = dist_list[int(lenth/2)]
+        n3 = dist_list[int(3*lenth/4)]
+        for key in scores1.keys():
+            if float(scores1[key][1]) < n1:
+                scores1[key][1] = 1
+            elif n1 < float(scores1[key][1]) < n2:
+                scores1[key][1] = 0.6
+            elif n2 < float(scores1[key][1]) < n3:
+                scores1[key][1] = 0.4
+            elif float(scores1[key][1]) > n3:
+                scores1[key][1] = 0.1
+            scores1[key][2] = scores1[key][0] + 0.4*scores1[key][1]
             
-            
-            
-            
-            
-            
-            
-            
-            bundle_results = []
+        bundle_ids = sorted(scores1.items(), key = lambda k:k[1][2])
+        
                             
         
 
