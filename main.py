@@ -60,11 +60,15 @@ def get_item_attributes(all_prices, all_items):
     return items
 
 
-FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
-MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+# FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
+# MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+
+FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
+MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
 
 
-categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+# categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+categories = [FEMALE_CLOTHES, MALE_CLOTHES]
 BASE_PART = "https://www.blocket.se/hela_sverige"
 
 for category in categories:
