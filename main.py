@@ -138,6 +138,7 @@ for category in categories:
         payload ={
             "title": article['title'],
             "description": article['description'],
+            "date": article['date'],
             "size": article['size'],
             "gender": article['gender'],
             "color": article['color'],
