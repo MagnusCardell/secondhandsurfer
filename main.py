@@ -149,8 +149,12 @@ while (getting_queries):
                 scores1[key][1] = 0.1
             scores1[key][2] = scores1[key][0] + 0.4*scores1[key][1]
             
-        bundle_ids = sorted(scores1.items(), key = lambda k:k[1][2])
-        
+        bundle_ids = sorted(scores1.items(), key = lambda k:k[1][2],reverse = True)
+        final_results = []
+        for i in range(len(bundle_ids)):
+            ranks = bundle_ids[i][0]
+            final_results.append([results[j][ranks[j]] for j in range(num_q)])
+            
                             
         
 
