@@ -15,7 +15,7 @@ headers = {
 
 @search_blueprint.route("/",methods=['GET','POST'],endpoint='index')
 def index():
-  return connect_elasticsearch()
+  return
 
 @search_blueprint.route("/search",methods=['POST'],endpoint='search')
 def search():
@@ -23,6 +23,8 @@ def search():
         req_data = request.get_json()
         search_data = req_data["params"]
         search_term = search_data["term"]
+
+
         print("Search Term:", search_term)
         payload = {
           "query": {
@@ -39,7 +41,9 @@ def search():
         url = "http://localhost:9200/blocket/items/_search"
         response = requests.request("GET", url, data=payload, headers=headers)
         #Filtering/sorting/ and all that novelty stuff here?
-        
+
+
+
         response_dict_data = json.loads(str(response.text))
         return json.dumps(response_dict_data)
 

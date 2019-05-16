@@ -3,20 +3,19 @@ const vm = new Vue ({
     data () {
       return {
         baseUrl: 'http://localhost:8005', // API
-        searchTerm: '', // default search term
-        searchDebounce: null, // Timeout for search bar debounce
-        searchResults: [], // Displayed search results
-        numHits: null, // Total search results found
+        searchTerm: '', // search phrase
+        searchDebounce: null, // timeout
+        searchResults: [], // results
+        numHits: null, // results enumerator
   
-        selectedItem: null, // selected object
-        paragraphs: [] // Paragraphs being displayed in book preview window
+        selectedBundle: null,
+        selectedItem: null, 
       }
     },
     async created () {
-      this.searchResults = await this.search() // Search for default term
+      this.searchResults = await this.search() // connection test
     },
     methods: {
-      /** Debounce search input by 100 ms */
       onSearchInput () {
         clearTimeout(this.searchDebounce)
         this.searchDebounce = setTimeout(async () => {

@@ -35,8 +35,8 @@ def get_item_attributes(all_prices, all_items):
             }
     """
     items = []
-    for prices, items in zip(all_prices, all_items):
-        for price, item in zip(prices, items):
+    for prices, items2 in zip(all_prices, all_items):
+        for price, item in zip(prices, items2):
             item_request = requests.get(item['href'])
             item_soup = BeautifulSoup(item_request.text, features="html.parser")
 
@@ -56,7 +56,7 @@ def get_item_attributes(all_prices, all_items):
                 "location": location
             }
             items.append(item)
-            print(item)
+            #print(item)
     return items
 
 
@@ -107,31 +107,38 @@ for category in categories:
 
         test_soup = BeautifulSoup(r.text, features="html.parser")
         prices = test_soup.findAll("p", attrs={"class": "list_price font-large"})
-        items = test_soup.findAll("a", attrs={"class": "item_link"})
+        items_raw = test_soup.findAll("a", attrs={"class": "item_link"})
 
         all_prices.append(prices)
-        all_items.append(items)
+        all_items.append(items_raw)
 
         items = get_item_attributes(all_prices, all_items)
 
         counter += 1
 
     i = 1
-    for id, item in enumerate(items):
+   
+    print("now items")
+    print(items)
+
+    for article in items:
+        print(article)
+        print(id)
         blocket_url = "http://localhost:9200/blocket/items"
         payload ={
-            "title": item.title,
-            "description": item.description,
-            "size": item.size,
-            "gender": item.gender,
-            "color": item.color,
-            "price": item.price,
-            "location": item.location
+            "title": article['title'],
+            "description": article['description'],
+            "size": article['size'],
+            "gender": article['gender'],
+            "color": article['color'],
+            "price": article['price'],
+            "location": article['location']
         }
         headers = {
             'Content-Type': "application/json",
             'cache-control': "no-cache"
         }
+        print(payload)
         payload = json.dumps(payload)
 
         response = requests.request("POST", blocket_url, data=payload, headers=headers)

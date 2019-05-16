@@ -8,7 +8,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" rel="stylesheet" type="text/css" />
   <link href="https://cdn.muicss.com/mui-0.9.20/css/mui.min.css" rel="stylesheet" type="text/css" />
   <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,700|Open+Sans" rel="stylesheet">
-  <link href="styles.css" rel="stylesheet" />
+  <link href="style.css" rel="stylesheet" />
 </head>
 <body>
 <div class="app-container" id="vue-instance">
@@ -26,10 +26,14 @@
     <!-- Search Results Card List -->
     <div class="search-results" ref="searchResults">
       <div class="mui-panel" v-for="hit in searchResults">
-        <div class="mui--text-title" v-html="hit.highlight.text[0]"></div>
+        <div class="mui--text-title" v-html="hit._source.title"></div>
         <div class="mui-divider"></div>
         <div class="mui--text-subhead">{{ hit._source.title }} - {{ hit._source.price }}</div>
-        <div class="mui--text-body2">Type {{ hit._source.index }}</div>
+        <div class="mui--text-body2">Size: {{ hit._source.size }}</div>
+        <div class="mui--text-body2">Gender: {{ hit._source.gender }}</div>
+        <div class="mui--text-body2">Color: {{ hit._source.color }}</div>
+        <div class="mui--text-body2">Location: {{ hit._source.location }}</div>
+        <div class="mui--text-body2">Description: {{ hit._source.description }}</div>
       </div>
     </div>
 
