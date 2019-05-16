@@ -59,7 +59,8 @@ def get_item_attributes(all_prices, all_items):
                 "gender": "M",
                 "color": "black",
                 "price": price.text,
-                "location": location
+                "location": location,
+                "link": item['href'],
             }
             items.append(item)
             print(item)
