@@ -10,6 +10,7 @@ TODO: Traverse all pages
 """
 
 import requests, json
+import shutil
 from elasticsearch import Elasticsearch
 from datetime import datetime
 es = Elasticsearch()
@@ -19,7 +20,21 @@ es = Elasticsearch()
 from bs4 import BeautifulSoup
 import bs4
 
-def get_item_attributes(all_prices, all_items):
+
+
+def get_file(url):
+    with open("test.jpg", "wb") as out_file:
+        r = requests.get("https://cdn.blocket.com/static/0/images_full/32/3283216851.jpg", stream=True)
+        if not r.ok:
+            print(r)
+        else:
+            for block in r.iter_content(1024):
+                if not block:
+                    break
+                out_file.write(block)
+
+
+def get_item_attributes(all_prices, all_items, gender):
     """
     Function to create an item with all its corresponding
     attributes. The attributes are contained within the link
@@ -42,6 +57,7 @@ def get_item_attributes(all_prices, all_items):
             item_soup = BeautifulSoup(item_request.text, features="html.parser")
 
             location = item_soup.find("span", attrs={"class": "area_label"})
+            picture_link = item_soup.find("img")
             date_added = item_soup.find("time")['datetime']
             datetime_obj = datetime.strptime(date_added, "%Y-%m-%dT%H:%M")
             # print(datetime_obj.hour)
@@ -56,10 +72,11 @@ def get_item_attributes(all_prices, all_items):
                 "date": converted_date,
                 "description": description,
                 "size": "placeholder",
-                "gender": "M",
+                "gender": "M" if gender == 1 else "F",
                 "color": "black",
                 "price": price.text,
-                "location": location
+                "location": location,
+                "link": item['href'],
             }
             items.append(item)
             #print(item)
@@ -77,7 +94,7 @@ MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
 categories = [FEMALE_CLOTHES, MALE_CLOTHES]
 BASE_PART = "https://www.blocket.se/hela_sverige"
 
-for category in categories:
+for gender, category in enumerate(categories):
     r = requests.get(BASE_PART + category)
 
     soup = BeautifulSoup(r.text, features="html.parser")
@@ -122,7 +139,7 @@ for category in categories:
         all_prices.append(prices)
         all_items.append(items_raw)
 
-        items = get_item_attributes(all_prices, all_items)
+        items = get_item_attributes(all_prices, all_items, gender)
 
         counter += 1
 
