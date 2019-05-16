@@ -11,6 +11,7 @@ TODO: Traverse all pages
 
 import requests, json
 from elasticsearch import Elasticsearch
+from datetime import datetime
 es = Elasticsearch()
 
 
@@ -41,6 +42,10 @@ def get_item_attributes(all_prices, all_items):
             item_soup = BeautifulSoup(item_request.text, features="html.parser")
 
             location = item_soup.find("span", attrs={"class": "area_label"})
+            date_added = item_soup.find("time")['datetime']
+            datetime_obj = datetime.strptime(date_added, "%Y-%m-%dT%H:%M")
+            # print(datetime_obj.hour)
+            converted_date = str(datetime_obj.month) + "/" + str(datetime_obj.day) + "/" + str(datetime_obj.year)
             description = item_soup.find("div", attrs={"class": "col-xs-12 body"}).text
             if location:
                 location = location.text.replace("(", "").replace(")", "")
@@ -48,6 +53,7 @@ def get_item_attributes(all_prices, all_items):
                 location = "Sweden"
             item = {
                 "title": item.text,
+                "date": converted_date,
                 "description": description,
                 "size": "placeholder",
                 "gender": "M",
@@ -60,11 +66,15 @@ def get_item_attributes(all_prices, all_items):
     return items
 
 
-FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
-MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+# FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
+# MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+
+FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
+MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
 
 
-categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+# categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+categories = [FEMALE_CLOTHES, MALE_CLOTHES]
 BASE_PART = "https://www.blocket.se/hela_sverige"
 
 for category in categories:
