@@ -100,6 +100,10 @@ while (getting_queries):
     for n in range(num_q):
         
         #q = ' '.join(processed_queries[n])
+        list_ids = []
+        for k in processed_queries[n]:
+        list_ids = list_ids + es.search(index='clothes',doc_type='item',body={'query':k})
+        
         for i in range(len(descriptions)):
             """ Update this command """
             ad = es.get(index = 'clothes', doc_type = 'item', id = i)["_source"]
