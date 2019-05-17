@@ -21,12 +21,26 @@ docker-compose build
 docker-compose up 
 ```
 
-Which will start the elasticsearch, flask api, and frontend services. Now hit **localhost:8005** and you can see the application running. To setup a debug environment, we recommend starting the servies individually 
+If this is the first time you are running the project, you then need to run the index setup and crawler script. 
+
+```
+py manage_index.py
+py blocket_scraper.py
+```
+The scraper will try to get all items from clothes and shoes categories, and can therefore take a substantial amount to complete. 
+
+With the scraping complete, hit **localhost:8005** and you can see the application running. 
+
+To setup a debug environment, we recommend starting the servies individually. 
 
 ```
 docker-compose up elasticsearch
 docker-compose up frontend
 py app.py
+```
+To run app.py you need to run:
+```
+pip install -r requirements.txt
 ```
 Then visit **localhost:8005** for the web interface, and **localhost:9200** for elasticsearch. 
 
