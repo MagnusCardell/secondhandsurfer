@@ -13,14 +13,13 @@ import requests, json
 import shutil
 from elasticsearch import Elasticsearch
 from datetime import datetime
-es = Elasticsearch()
-
-
+from routes.algorithms import ad
+import ast
 
 from bs4 import BeautifulSoup
 import bs4
 
-
+es=Elasticsearch([{'host':'localhost','port':9200}])
 
 def get_file(url):
     with open("test.jpg", "wb") as out_file:
@@ -74,7 +73,7 @@ def get_item_attributes(all_prices, all_items, gender):
                 "size": "placeholder",
                 "gender": "M" if gender == 1 else "F",
                 "color": "black",
-                "price": price.text,
+                "price": price.text.split(" ")[0],
                 "location": location,
                 "link": item['href'],
             }
@@ -83,18 +82,20 @@ def get_item_attributes(all_prices, all_items, gender):
     return items
 
 
-# FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
-# MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
+MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
 
-FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
-MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
+#FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
+#MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
 
 
-# categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
-categories = [FEMALE_CLOTHES, MALE_CLOTHES]
+categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+#categories = [FEMALE_CLOTHES, MALE_CLOTHES]
 BASE_PART = "https://www.blocket.se/hela_sverige"
 
-for gender, category in enumerate(categories):
+iterator = 1
+#for gender, category in enumerate(categories):
+for category in categories:
     r = requests.get(BASE_PART + category)
 
     soup = BeautifulSoup(r.text, features="html.parser")
@@ -139,15 +140,13 @@ for gender, category in enumerate(categories):
         all_prices.append(prices)
         all_items.append(items_raw)
 
-        items = get_item_attributes(all_prices, all_items, gender)
+        items = get_item_attributes(all_prices, all_items, 1)
 
         counter += 1
 
-    i = 1
-
     for article in items:
-        blocket_url = "http://localhost:9200/blocket/items"
-        payload ={
+        blocket_url = "http://localhost:9200/blocket2/items"
+        content ={
             "title": article['title'],
             "description": article['description'],
             "date": article['date'],
@@ -157,16 +156,30 @@ for gender, category in enumerate(categories):
             "price": article['price'],
             "location": article['location']
         }
+        #content = payload
+        content['description'] = content['description'].replace('\t','')
+        content['description'] = content['description'].replace('\n','')
+        #add code to initiate the id class
+        item = ad.ad(content['price'], content['size'], content['title'], content['description'], content['location'], content['date'])
+        #descriptions.append(' '.join(item.tokens))
+        #add the condition, number of days and color to json file
+        content['condition'] = item.condition 
+        content['color'] = item.colors
+        content['num_days'] = item.days
+        content['info'] = ' '.join(item.tokens)
+        content['id'] = iterator
+        content['score'] = 0
+        iterator += 1
         headers = {
             'Content-Type': "application/json",
             'cache-control': "no-cache"
         }
-        payload = json.dumps(payload)
+        payload = json.dumps(content)
 
-        response = requests.request("POST", blocket_url, data=payload, headers=headers)
-        if(response.status_code==201):
-            print("----------------", i, "----------------------")
-        i = i + 1
+        print(payload)
+        es.index(index="blocket2", doc_type="items", id=iterator, body=payload)
+        #response = requests.request("POST", blocket_url, data=payload, headers=headers)
+
         #res = es.index(index="jeans", doc_type='item', id=id, body=item)
 
     

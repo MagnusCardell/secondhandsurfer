@@ -12,25 +12,33 @@ from geopy.geocoders import Nominatim
 import geopy.distance
 from datetime import datetime
 import itertools
-from sklearn.feature_extraction.text import TfidfVectorizer
+#from sklearn.feature_extraction.text import TfidfVectorizer
 
 def get_coordinates(address):
 
 	#get latitute and longitute from location name
 	geolocator = Nominatim()
 	location = geolocator.geocode(address)
-	return (location.latitute, location.longitute)
-
+	if(location == None):
+		return 0
+	else:
+		return(location.latitude, location.longitude)
 	
 
 def distance(location1, location2):
-	#distance between two places on earth. only considering straight line distance
-	return float(geopy.distance.vincenty(location1,location2).km)
+	loc1 = get_coordinates(location1)
+	loc2 = get_coordinates(location2)
+	if(loc1 == 0 or loc2 == 0):
+		return 0
+	if(loc1 != 0 and loc2 != 0):
+		#distance between two places on earth. only considering straight line distance
+		return float(geopy.distance.vincenty(loc1,loc2).km)
+	else:
+		return 0
 
 
 
 def least_distance(locations):
-
 	if len(locations) == 1:
 		return 0
 	elif len(locations) == 2:
@@ -55,12 +63,12 @@ def least_distance(locations):
 
 
 
-def tfidf_vectors(descriptions):
+""" def tfidf_vectors(descriptions):
 	vectorizer = TfidfVectorizer(min_df=0, )
 	X = vectorizer.fit_transform(descriptions)
-    return
+	return
 
-
+ """
 
 
 def find_color(query):

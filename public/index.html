@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Secondhand surfer</title>
-  <meta name="description" content="Literary Classic Search Engine.">
+  <meta name="description" content="Search Engine Surfer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" rel="stylesheet" type="text/css" />
   <link href="https://cdn.muicss.com/mui-0.9.20/css/mui.min.css" rel="stylesheet" type="text/css" />
@@ -13,10 +13,14 @@
 <body>
 <div class="app-container" id="vue-instance">
     <div class="mui-panel">
-      <div class="mui-textfield">
-        <input v-model="searchTerm" type="text" v-on:keyup="onSearchInput()">
-        <label>Search</label>
-      </div>
+        <div class="mui-row">
+            <div class="mui-col-md-6 mui-textfield">
+                <input v-model="searchTerm" placeholder="Enter query" type="text" v-on:keyup.enter="onSearchInput()">
+            </div>
+            <div class="mui-col-md-6 mui-textfield">
+                <input type="number" v-model="maxBudget" placeholder="Enter budget" name="quantity" v-on:keyup="onBudgetInput()" >
+            </div>
+          </div>
     </div>
 
     <div class="mui-panel">
@@ -24,18 +28,46 @@
     </div>
 
     <!-- Search Results Card List -->
-    <div class="search-results" ref="searchResults">
-      <div class="mui-panel" v-for="hit in searchResults">
-        <div class="mui--text-title" v-html="hit._source.title"> - {{hit._source.price}}</div>
-        <div class="mui-divider"></div>
-        <div class="mui--text-subhead">Uploaded: {{ hit._source.date}}</div>
-        <div class="mui--text-body2">Size: {{ hit._source.size }}</div>
-        <div class="mui--text-body2">Gender: {{ hit._source.gender }}</div>
-        <div class="mui--text-body2">Color: {{ hit._source.color }}</div>
-        <div class="mui--text-body2">Location: {{ hit._source.location }}</div>
-        <div class="mui--text-body2">Description: {{ hit._source.description }}</div>
+    <div class="search-results" ref="searchResults" v-if="!hideAll">
+      <div class="mui-panel" v-if=" (maxBudget==null || bundle.total_price < maxBudget)" v-for="(bundle, i) in searchResults">
+        <div class="mui--text-title locations-label" v-html="bundle.total_price"> </div>
+        <div class="mui-panel" v-for="(hit, inner) in bundle.data" v-on:click="showSwapOptions(hit, i, inner)"> 
+            <div class="mui--text-title" v-html="hit.title"> </div>
+            <div class="mui-divider"></div>
+            <div class="mui--text-subhead">Price: {{ hit.price}}</div>
+            <div class="mui--text-subhead">Uploaded: {{ hit.date}}</div>
+            <div class="mui--text-body2">Gender: {{ hit.gender }}</div>
+            <div class="mui--text-body2">Color: {{ hit.color }}</div>
+            <div class="mui--text-body2">Location: {{ hit.location }}</div>
+            <div class="mui--text-body2">Description: {{ hit.description }}</div>
+        </div>
       </div>
     </div>
+    <div class="search-results" ref="selectedBundle" v-if="hideAll">
+        <div class="mui-panel">
+          <div class="mui--text-title locations-label" v-html="selectedBundle.price"> </div>
+          <div class="mui-panel" v-on:click="end_swap()"> 
+              <div class="mui--text-title" v-html="selectedBundle.title"> </div>
+              <div class="mui-divider"></div>
+              <div class="mui--text-subhead">Price: {{ selectedBundle.price}}</div>
+              <div class="mui--text-subhead">Uploaded: {{ selectedBundle.date}}</div>
+              <div class="mui--text-body2">Gender: {{ selectedBundle.gender }}</div>
+              <div class="mui--text-body2">Color: {{ selectedBundle.color }}</div>
+              <div class="mui--text-body2">Location: {{ selectedBundle.location }}</div>
+              <div class="mui--text-body2">Description: {{ selectedBundle.description }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="search-results" ref="swaps" v-if="hideAll">
+          <div class="mui-panel" v-for="bundle in swaps">
+            <div class="mui--text-title locations-label" v-html="bundle.price"> </div>
+            <div class="mui-panel" v-on:click="swap_this(bundle)"> 
+                <div class="mui--text-title" v-html="bundle.title"> </div>
+                <div class="mui-divider"></div>
+                <div class="mui--text-subhead">Price: {{ bundle.price}}</div>
+            </div>
+          </div>
+        </div>
 
 </div>
 <script src="https://cdn.muicss.com/mui-0.9.28/js/mui.min.js"></script>

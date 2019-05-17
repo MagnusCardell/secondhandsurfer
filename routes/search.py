@@ -1,11 +1,16 @@
 from elasticsearch import Elasticsearch
 from flask import Blueprint,render_template,request,jsonify
 import requests,json
+from .algorithms import manager as manager
+from elasticsearch_dsl import connections, Search
+from elasticsearch import Elasticsearch
 
 # creating a Blueprint class
 search_blueprint = Blueprint('search',__name__,template_folder="templates")
 search_term = ""
-es = Elasticsearch(hosts=[{"host":'elasticsearch'}]) 
+#es = Elasticsearch(hosts=[{"host":'elasticsearch'}]) 
+es=Elasticsearch([{'host':'localhost','port':9200}])
+
 
 headers = {
     'Content-Type': "application/json",
@@ -24,29 +29,38 @@ def search():
         search_data = req_data["params"]
         search_term = search_data["term"]
 
+        """ all_res = []
+        for q in format_query(search_term):
+          res= es.search(index='blocket2', body={ "query": {
+            "function_score": {
+                "functions": [
+                    {
+                    "field_value_factor": {
+                        "field": "price",
+                        "factor": 1,
+                        "missing": 1
+                    }
+                    }
+                ],
+                "query": {
+                    "match": {"_all": q}
+                },
+                "boost_mode": "replace"
+                }
+            }} )
+        all_res.append(res) """
 
-        print("Search Term:", search_term)
-        payload = {
-          "query": {
-            "query_string": {
-              "analyze_wildcard": True,
-              "query": str(search_term),
-              "fields": ["title", "description", "size", "gender", "color", "price", "location"]
-            }
-          },
-          "size": 50,
-          "sort": [ ]
-        }
-        payload = json.dumps(payload)
-        url = "http://localhost:9200/blocket/items/_search"
-        response = requests.request("GET", url, data=payload, headers=headers)
-        #Filtering/sorting/ and all that novelty stuff here?
 
 
+        res2 = manager.new_query(es, search_term, headers)
 
-        response_dict_data = json.loads(str(response.text))
-        return json.dumps(response_dict_data)
+        #response_dict_data = json.loads(res)
+        return json.dumps(res2)
 
+
+def format_query(query):
+  q = query.split(',')
+  return q
 
 #This should not exist in production settings
 @search_blueprint.after_request

@@ -6,10 +6,16 @@ const vm = new Vue ({
         searchTerm: '', // search phrase
         searchDebounce: null, // timeout
         searchResults: [], // results
-        numHits: null, // results enumerator
-  
+        numHits: 0, // results enumerator
+        maxBudget: null,
+        filter: false,
         selectedBundle: null,
-        selectedItem: null, 
+        hideAll: false,
+        swaps: [],
+        swaps_raw:[],
+        select_i: null,
+        select_ii: null
+        
       }
     },
     async created () {
@@ -32,9 +38,31 @@ const vm = new Vue ({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           } })
-        this.numHits = response.data.hits.total
-        return response.data.hits.hits
+        this.numHits = response.data.search.length
+        this.swaps_raw = response.data.swap
+        return response.data.search
       },
+      onBudgetInput(){
+        this.filter = true;
+      },
+      showSwapOptions(h, i, inner){
+        this.selectedBundle = h;
+        this.swaps = this.swaps_raw[inner];
+        this.hideAll = true;
+        this.select_i = i;
+        this.select_ii = inner;
+        
+      },
+      end_swap(){
+        this.hideAll = false;
+        this.selectedBundle = null;
+      },
+      swap_this(bund){
+        this.selectedBundle = bund;
+        this.hideAll = false;
+        this.searchResults[this.select_i].data[this.select_ii] = bund;
+        this.selectedBundle = null;
+      }
 
     }
   })

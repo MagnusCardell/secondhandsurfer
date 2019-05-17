@@ -1,5 +1,3 @@
-!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon May 13 04:15:27 2019
 
@@ -8,12 +6,12 @@ Created on Mon May 13 04:15:27 2019
 
 #import packages
 
-from mtranslate import translate
+from mtranslate import translate 
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 import re
 from collections import Counter
-from preprocessing import * 
+from .preprocessing import * 
 
 class ad:
     
@@ -28,22 +26,23 @@ class ad:
         self.desc = descriptiion
         self.place = location
         self.indate = indate
+        self.condition = 0
+        self.text = self.title + " " + self.desc
+        self.num_days()
         self.preprocess_text()
         self.get_color()
         self.get_condition()
-        self.num_days()
-
-    self.text = self.title + " " + self.desc
 
     def translate_english(self):
         #translate text to english
-        return (translate(self.text,"en","auto"))
+        return translate(self.text,"en","auto")
 
 
     def tokenize(self): 
         
         #remove punctuation
         text = re.sub(r'[^\w\s]','',self.text)
+            
         return word_tokenize(self.text.lower())
 
 
@@ -66,11 +65,11 @@ class ad:
 
 
     def preprocess_text(self):
-        self.text = translate_english()
-        tokens = tokenize()
-        stemmed_words = stemming(tokens)
+        self.text = self.translate_english()
+        tokens = self.tokenize()
+        stemmed_words = self.stemming(tokens)
         #return joined list of unique words in text
-        unique_words = unique_words(stemmed_words)
+        unique_words = self.unique_words(stemmed_words)
         self.tokens =  unique_words  ##" ".join(unique_words)
         return
 
@@ -112,25 +111,8 @@ class ad:
     def num_days(self):
         #number of days the product is unsold
         today = datetime.today().strftime('%m/%d/%Y')
-        a = datetime.strptime(today, date_format)
-        b = datetime.strptime(self.indate, date_format)
+        a = datetime.strptime(today, "%m/%d/%Y")
+        b = datetime.strptime(self.indate, "%m/%d/%Y")
         delta = b - a
         self.days = delta.days
         return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
