@@ -84,7 +84,7 @@ def new_query(es, query, headers):
                 "functions": [
                     {
                     "field_value_factor": {
-                        "field": "price",
+                        "field": "score",
                         "factor": 1,
                         "missing": 1
                     }
