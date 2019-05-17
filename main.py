@@ -115,6 +115,15 @@ while (getting_queries):
         res = es.search(index='clothes', doc_type = 'item', id = ad['id'], body={' '.join(processed_queries[n])}, size = 10)
         results.append(res)
     
+    final_results = []
+    for i in range(num_q):
+        final_results.append(sorted(results[i], key = lambda k: results[i][k]['score']))
+    sizes = [len(results[i]) for i in range(num_q)]
+    size = min(sizes)
+    final_results1 = []
+    for i in range(size):
+        final_results1.append([final_results[j][i] for j in range(n)])
+        
     #now bundling
     
     if num_q > 1:
