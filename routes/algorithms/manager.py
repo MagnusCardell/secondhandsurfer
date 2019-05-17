@@ -101,12 +101,7 @@ def new_query(es, query, headers):
         temp = []
         for r in res:
             temp.append(r['_source'])
-
         results.append(temp)
-    
-    f = open("text.txt", "w")
-    f.write(str(results))
-    f.close()
 
     final_results = []
     for i in range(num_q):
