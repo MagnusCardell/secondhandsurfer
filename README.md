@@ -5,8 +5,6 @@ A search engine for finding the perfect bundle of items scraped from Blocket.se.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. 
-
 ### Prerequisites
 
 To run this project you need to have docker and docker-compose installed. With docker installed, all other dependencies and installs will be managed by the docker-image and kept isolated inside the container. 
