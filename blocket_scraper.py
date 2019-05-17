@@ -82,20 +82,20 @@ def get_item_attributes(all_prices, all_items, gender):
     return items
 
 
-FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
-MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
+#FEMALE_JEANS_LINK = "?q=&cg=4080&w=3&st=s&cs=1&ck=2&csz=&ca=11&is=1&l=0&md=th"
+#MALE_JEANS_LINK =   "?q=&cg=4080&w=3&st=s&cs=2&ck=2&csz=&ca=11&is=1&l=0&md=th"
 
-#FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
-#MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
+FEMALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=1&ck=&csz=&ca=11&is=1&l=0&md=th"
+MALE_CLOTHES = "?q=&cg=4080&w=3&st=s&cs=2&ck=&csz=&ca=11&is=1&l=0&md=th"
 
 
-categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
-#categories = [FEMALE_CLOTHES, MALE_CLOTHES]
+#categories = [FEMALE_JEANS_LINK, MALE_JEANS_LINK]
+categories = [FEMALE_CLOTHES, MALE_CLOTHES]
 BASE_PART = "https://www.blocket.se/hela_sverige"
 
 iterator = 1
-#for gender, category in enumerate(categories):
-for category in categories:
+for gender, category in enumerate(categories):
+#for category in categories:
     r = requests.get(BASE_PART + category)
 
     soup = BeautifulSoup(r.text, features="html.parser")
@@ -145,7 +145,7 @@ for category in categories:
         counter += 1
 
     for article in items:
-        blocket_url = "http://localhost:9200/blocket2/items"
+        blocket_url = "http://localhost:9200/blocket/items"
         content ={
             "title": article['title'],
             "description": article['description'],
@@ -156,12 +156,10 @@ for category in categories:
             "price": article['price'],
             "location": article['location']
         }
-        #content = payload
         content['description'] = content['description'].replace('\t','')
         content['description'] = content['description'].replace('\n','')
         #add code to initiate the id class
         item = ad.ad(content['price'], content['size'], content['title'], content['description'], content['location'], content['date'])
-        #descriptions.append(' '.join(item.tokens))
         #add the condition, number of days and color to json file
         content['condition'] = item.condition 
         content['color'] = item.colors
@@ -177,17 +175,6 @@ for category in categories:
         payload = json.dumps(content)
 
         print(payload)
-        es.index(index="blocket2", doc_type="items", id=iterator, body=payload)
+        es.index(index="blocket", doc_type="items", id=iterator, body=payload)
         #response = requests.request("POST", blocket_url, data=payload, headers=headers)
-
-        #res = es.index(index="jeans", doc_type='item', id=id, body=item)
-
     
-
-
-
-
-
-
-
-

@@ -3,20 +3,14 @@ from . import preprocessing as pre
 import ast
 import json
 import os
-#import requests
-#from elasticsearch import Elasticsearch
 import numpy as np
 import math
 import statistics
 import operator
 import requests
-#def indexing(path):
     
 
-#return descriptions
-
-
-def relevance_score(ad, query, color):
+def relevance_score(ad, query, color, n_items):
 
     """
     depends on color - 0.2 , similarity measure - 0.4 , date posted - 0.1 , condition - 0.1, match with size 0.2
@@ -46,51 +40,15 @@ def relevance_score(ad, query, color):
         for j in ad['info']: #description + title
             if k == j:
                 """ Update this command """
-                hits = es.search(index='blocket2',doc_type='item',body={'query':k})['hits']['total'] #num of hits
+                hits = es.search(index='blocket',doc_type='item',body={'query':k})['hits']['total'] #num of hits
                 s_score  = s_score + (n_items/float(math.log10(hits)))#^2
     
     s_score = (s_score/len(query))*10
     score = float(0.2*c_score + 0.5*s_score + 0.2*condition_score + 0.1*d_score)
     return score
 
-
-
-""" es = Elasticsearch()
-path = 'data/'
-#indexing(path)
-##get query from frontend
-descriptions = []
-for filename in os.listdir(path):
-    #read json file
-    i = 0
-    
-    file = open(filename, "r")
-    content = json.load(file)
-    content = ast.literal_eval(content)
-    content['description'] = content['description'].replace('\t','')
-    content['description'] = content['description'].replace('\n','')
-    #add code to initiate the id class
-    item = ad(content['price'], content['size'], content['title'], content['description'], content['place'], content['date'])
-    descriptions.append(' '.join(item.tokens))
-    #add the condition, number of days and color to json file
-    content['condition'] = item.condition 
-    content['color'] = item.colors
-    content['num_days'] = item.days
-    content['info'] = descriptions[i]
-    content['id'] = i
-    content['score'] = 0
-    es.index(index="clothes", doc_type='item', id=i, body=content)
-    i = i+1
-    file.close() """
-
-#n_items = len(descriptions)
-
 def new_query(es, query, headers):
-    url = "http://localhost:9200/blocket2/_stats"
-    response = requests.request("GET", url, headers=headers)
-    response_dict_data = json.loads(str(response.text))
-    
-    n_items = es.count(index = "blocket2").get('count')    
+    n_items = es.count(index = "blocket").get('count')    
 
     queries = query.split(',')
     if(len(queries) < 1) or query == "":
@@ -103,31 +61,25 @@ def new_query(es, query, headers):
         a, b = pre.find_color(queries[i])
         processed_queries.append(a)
         colors.append(b)
-        #processed_queries[i] = ' '.join(processed_queries[i])
 
     results = []
     for n in range(num_q):
         list_ids = []
         res = {}
         for k in processed_queries[n]:
-            res= es.search(index='blocket2', body={'query':{'match':{"info": k}}})['hits']['hits']
+            res= es.search(index='blocket', body={'query':{'match':{"info": k}}})['hits']['hits']
             list_ids = list_ids + res
-
-        #q = ' '.join(processed_queries[n])
 
         for item in list_ids:
             """ Update this command """
-            ad = item['_source'] # es.get(index = 'clothes', doc_type = 'item', id = i)["_source"]
-            #ad2 = es.search(index='blocket2', body={'query':{'match':{"_all": k}}})
-            score = relevance_score(ad, processed_queries[n], colors[n])
-
-            es.update(index='blocket2',doc_type='items', id=ad['id'], body={"doc": {"score" : score}})
-            #testres = es.search(index='blocket2', body={'query':{'match':{"_id": ad['id']} } })['hits']['hits']
+            ad = item['_source']
+            score = relevance_score(ad, processed_queries[n], colors[n], n_items)
+            es.update(index='blocket',doc_type='items', id=ad['id'], body={"doc": {"score" : score}})
 
         
         """ Update this search function """
         q = ' '.join(processed_queries[n])
-        res= es.search(index='blocket2', size=50, body={ "query": {
+        res= es.search(index='blocket', size=50, body={ "query": {
             "function_score": {
                 "functions": [
                     {
@@ -141,7 +93,7 @@ def new_query(es, query, headers):
                 "query": {
                     "match": {"info": k}
                 },
-                "boost_mode": "replace"
+                "boost_mode": "sum"
                 }
             }} )['hits']['hits']
     
@@ -169,7 +121,10 @@ def new_query(es, query, headers):
     for f in final_results1:
         total_price = 0
         for r in f:
-            total_price += int(r['price'])
+            if(r['price'] == ""):
+                total_price +=0
+            else:
+                total_price += int(r['price'])
         final_results2.append({"data": f, "total_price":total_price})
 
     resp = {"search":final_results2, "swap": results}

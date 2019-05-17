@@ -28,33 +28,7 @@ def search():
         req_data = request.get_json()
         search_data = req_data["params"]
         search_term = search_data["term"]
-
-        """ all_res = []
-        for q in format_query(search_term):
-          res= es.search(index='blocket2', body={ "query": {
-            "function_score": {
-                "functions": [
-                    {
-                    "field_value_factor": {
-                        "field": "price",
-                        "factor": 1,
-                        "missing": 1
-                    }
-                    }
-                ],
-                "query": {
-                    "match": {"_all": q}
-                },
-                "boost_mode": "replace"
-                }
-            }} )
-        all_res.append(res) """
-
-
-
         res2 = manager.new_query(es, search_term, headers)
-
-        #response_dict_data = json.loads(res)
         return json.dumps(res2)
 
 

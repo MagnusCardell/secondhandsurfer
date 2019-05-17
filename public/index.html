@@ -5,7 +5,6 @@
   <title>Secondhand surfer</title>
   <meta name="description" content="Search Engine Surfer">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css" rel="stylesheet" type="text/css" />
   <link href="https://cdn.muicss.com/mui-0.9.20/css/mui.min.css" rel="stylesheet" type="text/css" />
   <link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,700|Open+Sans" rel="stylesheet">
   <link href="style.css" rel="stylesheet" />
@@ -22,12 +21,9 @@
             </div>
           </div>
     </div>
-
     <div class="mui-panel">
       <div class="mui--text-headline">{{ numHits }} results</div>
     </div>
-
-    <!-- Search Results Card List -->
     <div class="search-results" ref="searchResults" v-if="!hideAll">
       <div class="mui-panel" v-if=" (maxBudget==null || bundle.total_price < maxBudget)" v-for="(bundle, i) in searchResults">
         <div class="mui--text-title locations-label" v-html="bundle.total_price"> </div>

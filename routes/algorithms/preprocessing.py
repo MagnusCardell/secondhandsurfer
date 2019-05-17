@@ -62,18 +62,8 @@ def least_distance(locations):
 		return 0
 
 
-
-""" def tfidf_vectors(descriptions):
-	vectorizer = TfidfVectorizer(min_df=0, )
-	X = vectorizer.fit_transform(descriptions)
-	return
-
- """
-
-
 def find_color(query):
     #extract color information from text
-
     text = re.sub(r'[^\w\s]','',query)
     tokens = word_tokenize(text.lower())
     stemmer = PorterStemmer()
