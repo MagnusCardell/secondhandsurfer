@@ -10,7 +10,7 @@ import operator
 import requests
     
 
-def relevance_score(ad, query, color, n_items):
+def relevance_score(es, ad, query, color, n_items):
 
     """
     depends on color - 0.2 , similarity measure - 0.4 , date posted - 0.1 , condition - 0.1, match with size 0.2
@@ -41,9 +41,9 @@ def relevance_score(ad, query, color, n_items):
             if k == j:
                 """ Update this command """
                 hits = es.search(index='blocket',doc_type='item',body={'query':k})['hits']['total'] #num of hits
-                s_score  = s_score + (n_items/float(math.log10(hits)))#^2
+                s_score  = s_score + (n_items/float(math.log10(hits)))
     
-    s_score = (s_score/len(query))*10
+    s_score = (s_score/len(query))
     score = float(0.2*c_score + 0.5*s_score + 0.2*condition_score + 0.1*d_score)
     return score
 
@@ -73,7 +73,7 @@ def new_query(es, query, headers):
         for item in list_ids:
             """ Update this command """
             ad = item['_source']
-            score = relevance_score(ad, processed_queries[n], colors[n], n_items)
+            score = relevance_score(es, ad, processed_queries[n], colors[n], n_items)
             es.update(index='blocket',doc_type='items', id=ad['id'], body={"doc": {"score" : score}})
 
         
@@ -93,7 +93,7 @@ def new_query(es, query, headers):
                 "query": {
                     "match": {"info": k}
                 },
-                "boost_mode": "sum"
+                "boost_mode": "replace"
                 }
             }} )['hits']['hits']
     
@@ -110,7 +110,8 @@ def new_query(es, query, headers):
     size = min(sizes)
     final_results1 = []
     for i in range(size):
-        final_results1.append([final_results[j][i] for j in range(num_q)])
+        #final_results1.append([results[j][i] for j in range(num_q)]) #Uncomment this to sort by our relevance score
+        final_results1.append([final_results[j][i] for j in range(num_q)])  #Uncomment this to sort by price
         
     final_results2 = []
     for f in final_results1:
